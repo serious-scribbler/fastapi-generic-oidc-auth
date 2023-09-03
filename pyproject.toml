@@ -24,7 +24,7 @@ development = [
     "nox == 2023.4.22",
     "pytest == 7.4.0",
     "pytest-cov == 4.0.0",
-    "types-requests == 2.28.11.17",
+    "types-requests == 2.31.0.2",
     "selenium == 4.10.0",
     "ruff == 0.0.287",
     "chromedriver-py == 116.0.5845.96"
