@@ -1,17 +1,17 @@
+import json
+import logging
 from base64 import b64encode
 from functools import wraps
-import json
 from json.decoder import JSONDecodeError
-import logging
 from urllib.parse import quote
 
-from fastapi import Request
 import jwt
-from jwt.exceptions import DecodeError, InvalidTokenError
 import requests
+from fastapi import Request
+from jwt.exceptions import DecodeError, InvalidTokenError
 from starlette.responses import RedirectResponse
 
-from fastapi_oidc_auth.exceptions import OpenIDConnectException
+from fastapi_oidc_auth.exceptions import OpenIDConnectError
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +50,9 @@ class OpenIDConnect:
         id_token = auth_token.get("id_token")
         try:
             alg = jwt.get_unverified_header(id_token).get("alg")
-        except DecodeError:
+        except DecodeError as err:
             logging.warning("Error getting unverified header in jwt.")
-            raise OpenIDConnectException
+            raise OpenIDConnectError from err
         validated_token = self.obtain_validated_token(alg, id_token)
         if not get_user_info:
             return validated_token
@@ -76,18 +76,14 @@ class OpenIDConnect:
         )
 
     def get_auth_token(self, code: str, callback_uri: str) -> dict:
-        authstr = "Basic " + b64encode(
-            f"{self.client_id}:{self.client_secret}".encode("utf-8")
-        ).decode("utf-8")
+        authstr = "Basic " + b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode("utf-8")
         headers = {"Authorization": authstr}
         data = {
             "grant_type": "authorization_code",
             "code": code,
             "redirect_uri": callback_uri,
         }
-        response = requests.post(
-            self.token_endpoint, data=data, headers=headers, verify=self.verify
-        )
+        response = requests.post(self.token_endpoint, data=data, headers=headers, verify=self.verify)
         return self.to_dict_or_raise(response)
 
     def obtain_validated_token(self, alg: str, id_token: str) -> dict:
@@ -99,9 +95,9 @@ class OpenIDConnect:
                     algorithms=["HS256"],
                     audience=self.client_id,
                 )
-            except InvalidTokenError:
+            except InvalidTokenError as err:
                 logger.error("An error occurred while decoding the id_token")
-                raise OpenIDConnectException("An error occurred while decoding the id_token")
+                raise OpenIDConnectError("An error occurred while decoding the id_token") from err
         elif alg == "RS256":
             response = requests.get(self.jwks_uri, verify=self.verify)
             web_key_sets = self.to_dict_or_raise(response)
@@ -114,11 +110,11 @@ class OpenIDConnect:
                     algorithms=["RS256"],
                     audience=self.client_id,
                 )
-            except InvalidTokenError:
+            except InvalidTokenError as err:
                 logger.error("An error occurred while decoding the id_token")
-                raise OpenIDConnectException("An error occurred while decoding the id_token")
+                raise OpenIDConnectError("An error occurred while decoding the id_token") from err
         else:
-            raise OpenIDConnectException("Unsupported jwt algorithm found.")
+            raise OpenIDConnectError("Unsupported jwt algorithm found.")
 
     def extract_token_key(self, jwks: dict, id_token: str) -> str:
         public_keys = {}
@@ -129,13 +125,13 @@ class OpenIDConnect:
             public_keys[kid] = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
         try:
             kid = jwt.get_unverified_header(id_token).get("kid")
-        except DecodeError:
+        except DecodeError as err:
             logger.warning("kid could not be extracted.")
-            raise OpenIDConnectException("kid could not be extracted.")
+            raise OpenIDConnectError("kid could not be extracted.") from err
         return public_keys.get(kid)
 
     def get_user_info(self, access_token: str) -> dict:
-        bearer = "Bearer {}".format(access_token)
+        bearer = f"Bearer {access_token}"
         headers = {"Authorization": bearer}
         response = requests.get(self.userinfo_endpoint, headers=headers, verify=self.verify)
         return self.to_dict_or_raise(response)
@@ -147,18 +143,18 @@ class OpenIDConnect:
             token_sub = token.get("sub")
         if token_sub != user_info.get("sub") or not token_sub:
             logger.warning("Subject mismatch error.")
-            raise OpenIDConnectException("Subject mismatch error.")
+            raise OpenIDConnectError("Subject mismatch error.")
 
     @staticmethod
     def to_dict_or_raise(response: requests.Response) -> dict:
         if response.status_code != 200:
-            logger.error(f"Returned with status {response.status_code}.")
-            raise OpenIDConnectException(f"Status code {response.status_code} for {response.url}.")
+            logger.error("Returned with status %s.", response.status_code)
+            raise OpenIDConnectError(f"Status code {response.status_code} for {response.url}.")
         try:
             return response.json()
-        except JSONDecodeError:
+        except JSONDecodeError as err:
             logger.error("Unable to decode json.")
-            raise OpenIDConnectException("Was not able to retrieve data from the response.")
+            raise OpenIDConnectError("Was not able to retrieve data from the response.") from err
 
     def require_login(self, view_func):
         @wraps(view_func)
@@ -171,7 +167,7 @@ class OpenIDConnect:
                 user_info = self.authenticate(code, callback_uri, get_user_info=get_user_info)
                 request.__setattr__("user_info", user_info)
                 return await view_func(request, *args, **kwargs)
-            except OpenIDConnectException:
+            except OpenIDConnectError:
                 return RedirectResponse(self.get_auth_redirect_uri(callback_uri))
 
         return decorated

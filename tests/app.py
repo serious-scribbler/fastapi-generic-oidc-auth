@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Request
-from starlette.responses import RedirectResponse
 import uvicorn
-
+from fastapi import FastAPI, Request
 from fastapi_oidc_auth.auth import OpenIDConnect
+from starlette.responses import RedirectResponse
 
 host = "http://localhost:8080"
 realm = "myrealm"
