@@ -18,8 +18,8 @@ jobs:
         docker run -d -p 8080:8080 \
             -e KEYCLOAK_USER=admin \
             -e KEYCLOAK_PASSWORD=admin \
-            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export.json \
-            -v $(pwd)/realm-export.json:/opt/jboss/keycloak/imports/realm-export.json \
+            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export-16.1.1.json \
+            -v $(pwd)/realm-export-16.1.1.json:/opt/jboss/keycloak/imports/realm-export-16.1.1.json \
             --name keycloak \
             jboss/keycloak:16.1.1
     

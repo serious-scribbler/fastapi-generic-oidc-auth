@@ -57,8 +57,8 @@ To start a Keycloak instance for testing, run the following command:
 docker run -d -p 8080:8080 \
             -e KEYCLOAK_USER=admin \
             -e KEYCLOAK_PASSWORD=admin \
-            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export.json \
-            -v $(pwd)/realm-export.json:/opt/jboss/keycloak/imports/realm-export.json \
+            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export-16.1.1.json \
+            -v $(pwd)/realm-export-16.1.1.json:/opt/jboss/keycloak/imports/realm-export-16.1.1.json \
             --name keycloak \
             jboss/keycloak:16.1.1
 ```
@@ -67,8 +67,8 @@ docker run -d -p 8080:8080 \
 docker run -d -p 8080:8080 `
             -e KEYCLOAK_USER=admin `
             -e KEYCLOAK_PASSWORD=admin `
-            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export.json `
-            -v ${PWD}\realm-export.json:/opt/jboss/keycloak/imports/realm-export.json `
+            -e KEYCLOAK_IMPORT=/opt/jboss/keycloak/imports/realm-export-16.1.1.json `
+            -v ${PWD}\realm-export-16.1.1.json:/opt/jboss/keycloak/imports/realm-export-16.1.1.json `
             --name keycloak `
             jboss/keycloak:16.1.1
 ```
@@ -81,7 +81,7 @@ docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh \
 -Dkeycloak.migration.provider=singleFile \
 -Dkeycloak.migration.realmName=myrealm \
 -Dkeycloak.migration.usersExportStrategy=REALM_FILE \
--Dkeycloak.migration.file=/tmp/realm-export.json
+-Dkeycloak.migration.file=/tmp/realm-export-16.1.1.json
 ```
 
 ```powershell
@@ -91,5 +91,5 @@ docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh `
   -Dkeycloak.migration.provider=singleFile `
   -Dkeycloak.migration.realmName=myrealm `
   -Dkeycloak.migration.usersExportStrategy=REALM_FILE `
-  -Dkeycloak.migration.file=/tmp/realm-export.json
+  -Dkeycloak.migration.file=/tmp/realm-export-16.1.1.json
 ```

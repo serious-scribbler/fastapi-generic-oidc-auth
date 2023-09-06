@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi_oidc_auth.auth import OpenIDConnect
 from starlette.responses import RedirectResponse
 
-host = "http://localhost:8080"
+host = "http://localhost:8080/auth"
 realm = "myrealm"
 client_id = "myclient"
 client_secret = "mBSW6roRlpoHp0bbGEAQIqUmaNZ4VDqd"
