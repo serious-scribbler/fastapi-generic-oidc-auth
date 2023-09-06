@@ -3,7 +3,9 @@ from fastapi import FastAPI, Request
 from fastapi_oidc_auth.auth import OpenIDConnect
 from starlette.responses import RedirectResponse
 
+# For newer keycloak version you can exclude the /auth in the url
 host = "http://localhost:8080/auth"
+
 realm = "myrealm"
 client_id = "myclient"
 client_secret = "mBSW6roRlpoHp0bbGEAQIqUmaNZ4VDqd"

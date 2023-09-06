@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["fastapi", "PyJWT[crypto]", "requests", "uvicorn"]
-version = "0.1.0"
+version = "0.2.0"
 authors = [
     { name = "Matthias Osswald", email = "m@osswald.li" },
     { name = "Pontus Thomsson", email = "p@gmail.com" },
@@ -19,13 +19,13 @@ license = { text = "GPL-3.0-or-later" }
 
 [project.optional-dependencies]
 development = [
-    "black == 23.3.0",
+    "black == 23.7.0",
     "mypy == 1.5.1",
     "nox == 2023.4.22",
-    "pytest == 7.4.0",
+    "pytest == 7.4.1",
     "pytest-cov == 4.1.0",
     "types-requests == 2.31.0.2",
-    "selenium == 4.10.0",
+    "selenium == 4.12.0",
     "ruff == 0.0.287",
     "chromedriver-py == 116.0.5845.96"
 ]
