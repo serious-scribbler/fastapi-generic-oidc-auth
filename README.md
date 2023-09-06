@@ -53,6 +53,7 @@ See test.py for a complete example.
 
 To start a Keycloak instance for testing, run the following command:
 
+### Linux
 ```bash
 docker run -d -p 8080:8080 \
             -e KEYCLOAK_USER=admin \
@@ -63,6 +64,7 @@ docker run -d -p 8080:8080 \
             jboss/keycloak:16.1.1
 ```
 
+### Windows
 ```powershell
 docker run -d -p 8080:8080 `
             -e KEYCLOAK_USER=admin `
@@ -75,6 +77,7 @@ docker run -d -p 8080:8080 `
 
 To export the realm configuration, run the following command:
 
+### Linux
 ```bash
 docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh \
 -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
@@ -83,6 +86,7 @@ docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh \
 -Dkeycloak.migration.usersExportStrategy=REALM_FILE \
 -Dkeycloak.migration.file=/tmp/realm-export-16.1.1.json
 ```
+### Windows
 
 ```powershell
 docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh `
