@@ -11,18 +11,16 @@ from fastapi import Request
 from jwt.exceptions import DecodeError, InvalidTokenError
 from starlette.responses import RedirectResponse
 
-from fastapi_oidc_auth.exceptions import OpenIDConnectError
+from fastapi_generic_oidc_auth.exceptions import OpenIDConnectError
 
 logger = logging.getLogger(__name__)
 
 
 class OpenIDConnect:
-    well_known_pattern = "{}/realms/{}/.well-known/openid-configuration"
 
     def __init__(
         self,
-        host: str,
-        realm: str,
+        config_url: str,
         app_uri: str,
         client_id: str,
         client_secret: str,
@@ -34,8 +32,9 @@ class OpenIDConnect:
         self.client_id = client_id
         self.client_secret = client_secret
         self.verify = verify
+        self.config_url = config_url
         endpoints = self.to_dict_or_raise(
-            requests.get(self.well_known_pattern.format(host, realm), verify=self.verify)
+            requests.get(config_url, verify=self.verify)
         )
         self.issuer = endpoints.get("issuer")
         self.authorization_endpoint = endpoints.get("authorization_endpoint")

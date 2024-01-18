@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi_oidc_auth.auth import OpenIDConnect
+from fastapi_generc_oidc_auth.auth import OpenIDConnect
 from starlette.responses import RedirectResponse
 
 # For newer keycloak version you can exclude the /auth in the url
